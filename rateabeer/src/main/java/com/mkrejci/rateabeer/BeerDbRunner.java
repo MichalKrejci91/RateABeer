@@ -7,6 +7,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+/**
+ * Fills the Beer DB after the first start of the App
+ */
 @Component
 public class BeerDbRunner implements ApplicationRunner {
     private BeerRepository repository;

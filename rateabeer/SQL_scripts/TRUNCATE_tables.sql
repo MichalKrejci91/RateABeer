@@ -1,0 +1,7 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE `beer`;
+TRUNCATE `app_user`;
+TRUNCATE `rating`;
+
+SET FOREIGN_KEY_CHECKS = 1;

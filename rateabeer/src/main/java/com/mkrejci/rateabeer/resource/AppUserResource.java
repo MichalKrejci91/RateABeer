@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Resource for creating App users & ratings
+ */
 @RestController
 @RequestMapping("/users")
 public class AppUserResource {
@@ -53,13 +56,6 @@ public class AppUserResource {
         return new ResponseEntity<>(appUserRepository.save(user), HttpStatus.CREATED) ;
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<AppUser> updateUser(@RequestBody AppUser user) {
-        AppUser updatedUser = appUserRepository.save(user);
-
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
-    }
-
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable int id) {
         appUserRepository.deleteById(id);
@@ -68,7 +64,7 @@ public class AppUserResource {
     }
 
     // == Ratings management methods ==
-    @GetMapping("/ratings/{id}")
+    @GetMapping("/{id}/ratings")
     public ResponseEntity<List<Rating>> getRatingsForUser(@PathVariable int id){
         Optional<AppUser> theUser = appUserRepository.findById(id);
 
@@ -121,14 +117,23 @@ public class AppUserResource {
     }
 
     @PutMapping("/ratings/{ratingId}")
-    public ResponseEntity<Rating> updateRating(@RequestBody Rating rating) {
-        Optional<Rating> theRating = ratingRepository.findById(rating.getId());
+    public ResponseEntity<Rating> updateRating(@PathVariable int ratingId ,@RequestBody Rating newRating) {
+        Optional<Rating> originalRating = ratingRepository.findById(ratingId);
 
-        if(theRating.isEmpty()) {
-            throw new RatingNotFoundException("Rating with ID " + rating.getId() + " was not found");
+        if(originalRating.isEmpty()) {
+            throw new RatingNotFoundException("Rating with ID " + newRating.getId() + " was not found");
         }
 
-        Rating updatedRating = ratingRepository.save(rating);
+        newRating.setId(originalRating.get().getId());
+        newRating.setBeer(originalRating.get().getBeer());
+
+        LocalDateTime now = LocalDateTime.now();
+        Timestamp timestamp = Timestamp.valueOf(now);
+        newRating.setTimestamp(timestamp);
+
+        newRating.setAppUser(originalRating.get().getAppUser());
+
+        Rating updatedRating = ratingRepository.save(newRating);
 
         return new ResponseEntity<>(updatedRating, HttpStatus.OK);
     }
